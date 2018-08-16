@@ -1,0 +1,44 @@
+<atlassian-plugin key="${atlassian.plugin.key}"
+                  name="agile KPI"
+                  pluginsVersion="2">
+    <!-- Contains plugin metadata. -->
+    <plugin-info>
+        <description>A  plugin showing how to add a gadget to JIRA.</description>
+        <vendor name="Atlassian" url="http://www.atlassian.com"/>
+        <version>1.0</version>
+    </plugin-info>
+
+    <!--
+        Registers the gadget spec as a plugin module. This allows the gadget to
+        appear in the gadget directory and also allows administrators to
+        disable/enable the gadget.
+     -->
+    <gadget key="tutorial-gadget" name="JIRA Tutorial Gadget" location="gadget.xml"/>
+
+
+    <!-- Makes the gadget Locale messages available for the gadget's use. -->
+    <resource type="download" name="i18n/ALL_ALL.xml" location="i18n/ALL_ALL.xml">
+        <param name="content-type" value="text/xml; charset=UTF-8"/>
+    </resource>
+
+    <!--
+        Automatically finds all JAX-RS resource classes in the plugin and
+        publishes them.
+     -->
+    <rest key="rest-resources" path="/kpi" version="1.0">
+        <description>Provides the REST resource for the project list.</description>
+    </rest>
+
+
+
+    <resource type="download" name="jquery-3.3.1.min.js" location="js/jquery-3.3.1.min.js" />
+
+
+
+
+
+
+
+
+
+</atlassian-plugin>

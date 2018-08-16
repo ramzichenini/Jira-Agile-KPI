@@ -1,0 +1,17 @@
+<messagebundle>
+    <msg name="gadget.title">Test jquery</msg>
+    <msg name="gadget.description">A sample gadget to install into JIRA.</msg>
+    <msg name="property.label">Display Name?</msg>
+    <msg name="property.description">Example Property from JTricks</msg>
+    <msg name="gadget.common.configure">Configure</msg>
+    <msg name="gadget.common.save">Save</msg>
+    <msg name="gadget.common.cancel">Cancel</msg>
+    <msg name="gadget.common.reload">Refresh</msg>
+    <msg name="gadget.common.refresh.label">Refresh every :</msg>
+    <msg name="gadget.common.refresh.never">Never</msg>
+    <msg name="gadget.common.refresh.description">description blabla</msg>
+    <msg name="gadget.common.refresh.minute">Every 15 Minutes</msg>
+    <msg name="gadget.common.refresh.minutes">Every 30 Minutes</msg>
+    <msg name="gadget.common.refresh.hour">Every 1 Hour</msg>
+    <msg name="gadget.common.refresh.hours">Every 2 Hours</msg>
+</messagebundle>

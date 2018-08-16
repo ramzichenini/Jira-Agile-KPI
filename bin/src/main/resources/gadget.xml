@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+    <ModulePrefs title="Agile KPIs" directory_title="__MSG_gadget.title__" description="__MSG_gadget.description__">
+        <Optional feature="gadget-directory">
+            <Param name="categories">
+                Other
+            </Param>
+        </Optional>
+        <Optional feature="atlassian.util" />
+        <Optional feature="auth-refresh" />
+        <Require feature="oauthpopup" />
+        <Require feature="dynamic-height"/>
+        <Require feature="setprefs"/>
+        <Require feature="settitle"/>
+        <Require feature="views"/>
+
+        #oauth
+        #supportedLocales("gadget.common,gadget.filter.results,gadget.issuetable.common")
+
+
+        <Locale messages="__ATLASSIAN_BASE_URL__/download/resources/com.atlassian.plugins.tutorial.jira-gadget-tutorial-plugin/i18n/ALL_ALL.xml"/>
+    </ModulePrefs>
+
+    <UserPref name="isConfigured" datatype="hidden" default_value="false"/>
+    <UserPref name="refresh" datatype="hidden" default_value="false"/>
+
+    <!--Jours de stock-->
+    <UserPref name="JStimeUnit" datatype="hidden" />
+    <UserPref name="JSBacklohGroup" datatype="hidden" />
+    <UserPref name="JSProjID" datatype="hidden" />
+
+
+    <!--Lead Time-->
+    <UserPref name="LDtimeUnit" datatype="hidden" />
+    <UserPref name="LDBacklogGroup" datatype="hidden" />
+    <UserPref name="LDProjID" datatype="hidden" />
+
+
+    <!--Estimé/réalisé-->
+    <UserPref name="ERconfig" datatype="hidden" />
+
+
+    <!--velocité-->
+    <UserPref name="Vconfig" datatype="hidden" />
+
+
+
+
+
+    <Content type="html" view="profile,canvas,home">
+        <![CDATA[
+        #requireResource("com.atlassian.jira.gadgets:common")
+        #requireResource("com.atlassian.gadgets.publisher:ajs-gadgets")
+        #requireResource("com.atlassian.jira.gadgets:autocomplete")
+        #includeResources()
+
+
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+            (function () {
+                var gadget = AJS.Gadget({
+                    baseUrl: "__ATLASSIAN_BASE_URL__",
+                    useOauth: "/rest/gadget/1.0/currentUser",
+
+
+                     config:
+                           {
+                            descriptor: function (args) {
+                            var gadget = this;
+
+                            var ok1=AJS.gadget.fields.projectOrFilterPicker(gadget, "JSProjID");
+                            var ok2=AJS.gadget.fields.projectOrFilterPicker(gadget, "LDProjID");
+
+
+                                    return {
+                                           fields: [
+
+
+                                               <!--*******************************-->
+                                                    <!--Jours de stock fields-->
+                                               <!--*******************************-->
+                                                {
+                                                    type: "custom",
+                                                    template: function(){
+                                                        return "<div id='sla' class='sla'><strong class='titleText'> Configuration du KPI : Jours de stock </strong></div>";
+                                                    }
+                                                },
+
+
+
+                                                  ok1,
+
+                                               {
+                                                    userpref: "JStimeUnit",
+                                                    label: "unité de la période",
+                                                    description:"",
+                                                    type: "select",
+                                                    selected: gadget.getPref("JStimeUnit"),
+                                                    options:[
+
+                                                                {
+                                                            label:"minute",
+                                                            value:"min"
+                                                                },
+                                                                {
+                                                            label:"heure",
+                                                            value:"hour"
+                                                                },
+                                                                {
+                                                            label:"jour",
+                                                            value:"day"
+                                                                }
+                                                             ]
+                                               },
+                                                {
+                                                    userpref: "JSBacklohGroup",
+                                                    label: "les backlogs à présenter ?",
+                                                    description:"",
+                                                    type: "select",
+                                                    selected: gadget.getPref("JSBacklohGroup"),
+                                                    options:[
+
+                                                                {
+                                                            label:"tous les backlogs",
+                                                            value:"AllBG"
+                                                                },
+                                                                {
+                                                            label:"les backlogs du projet séléctionné",
+                                                            value:"ProjectBG"
+                                                                },
+                                                                {
+                                                            label:"les backlog du sprint courant",
+                                                            value:"SprintCourantBG"
+                                                                }
+                                                             ]
+                                               },
+
+
+                                                  <!--*******************************-->
+                                                    <!--lead time fields-->
+                                                  <!--*******************************-->
+
+                                                  {
+                                                    type: "custom",
+                                                    template: function(){
+                                                        return "<div id='sla' class='sla'><strong class='titleText'> Configuration du KPI : Lead Time </strong></div>";
+                                                    }
+                                                },
+
+                                                ok2,
+                                               {
+                                                    userpref: "LDtimeUnit",
+                                                    label: "unité de la période  ?",
+                                                    description:"",
+                                                    type: "select",
+                                                    selected: gadget.getPref("LDtimeUnit"),
+                                                    options:[
+
+                                                                {
+                                                            label:"minute",
+                                                            value:"min"
+                                                                },
+                                                                {
+                                                            label:"heure",
+                                                            value:"hour"
+                                                                },
+                                                                {
+                                                            label:"jour",
+                                                            value:"day"
+                                                                }
+                                                             ]
+                                               },
+
+
+                                                {
+                                                    userpref: "LDBacklogGroup",
+                                                    label: "les backlogs à présenter ?",
+                                                    description:"",
+                                                    type: "select",
+                                                    selected: gadget.getPref("LDBacklogGroup"),
+                                                    options:[
+
+                                                                {
+                                                            label:"tous les backlogs",
+                                                            value:"AllBG"
+                                                                },
+                                                                {
+                                                            label:"les backlogs du projet séléctionné",
+                                                            value:"ProjectBG"
+                                                                },
+                                                                {
+                                                            label:"les backlog du sprint courant",
+                                                            value:"SprintCourantBG"
+                                                                }
+                                                             ]
+                                               },
+
+                                                {
+                                                    type: "custom",
+                                                    template: function(){
+                                                        return "<div id='sla' class='sla'><strong class='titleText'> Configuration du KPI : Réalisé/planifié </strong></div>";
+                                                    }
+                                                },
+
+
+                                                {
+                                                    userpref: "ERconfig",
+                                                    label: "Sprint Board",
+                                                    description:"",
+                                                    type: "select",
+                                                    selected: gadget.getPref("ERconfig"),
+                                                    options:[
+
+                                                                {
+                                                            label:"BP board",
+                                                            value:"BP board"
+                                                                },
+                                                                {
+                                                            label:"TEST board",
+                                                            value:"TEST board"
+                                                                },
+                                                                {
+                                                            label:"PV board",
+                                                            value:"PV board"
+                                                                }
+                                                             ]
+                                               },
+
+                                                {
+                                                    type: "custom",
+                                                    template: function(){
+                                                        return "<div id='sla' class='sla'><strong class='titleText'> Configuration du KPI : Vélocité </strong></div>";
+                                                    }
+                                                },
+
+
+                                                {
+                                                    userpref: "Vconfig",
+                                                    label: "Sprint Board",
+                                                    description:"",
+                                                    type: "select",
+                                                    selected: gadget.getPref("Vconfig"),
+                                                    options:[
+
+                                                                {
+                                                            label:"BP board",
+                                                            value:"BP board"
+                                                                },
+                                                                {
+                                                            label:"TEST board",
+                                                            value:"TEST board"
+                                                                },
+                                                                {
+                                                            label:"PV board",
+                                                            value:"PV board"
+                                                                }
+                                                             ]
+                                               },
+
+
+                                                AJS.gadget.fields.nowConfigured()
+
+
+
+                                           ]
+
+                                    };
+                              }
+                            },
+
+
+
+                    view: {
+                        onResizeAdjustHeight: true,
+                        enableReload: true,
+                        template: function(args) {
+                            var gadget = this;
+
+                            <!--*******************************-->
+                            <!---->
+                            <!--*******Jours de stocks*********-->
+                            <!---->
+                            <!--*******************************-->
+
+
+                            AJS.$("<div id='chart_div_JS' />").appendTo(gadget.getView() );
+
+
+                                      google.charts.load('current', {packages: ['corechart', 'line']});
+                                      google.charts.setOnLoadCallback(drawJS);
+
+                                      function drawJS() {
+                                        var jsonData = jQuery.ajax({
+                                          url: "/rest/kpi/1.0/jstock.json",
+                                          dataType: "json",
+                                          data:                     {
+                                                                        ProjectID: gadget.getPref("JSProjID"),
+                                                                        BacklogGroupe: gadget.getPref("JSBacklohGroup"),
+                                                                        TimeUnit: gadget.getPref("JStimeUnit")
+                                                                    },
+                                          async: false
+                                          }).responseText;
+
+
+                                        var array  = jQuery.parseJSON(jsonData);
+
+                                        var data = new google.visualization.DataTable();
+
+                                          data.addColumn('string', 'nom des backlogs');
+                                          data.addColumn('number', 'Nbre de jours de stock');
+
+                                          data.addRows(array);
+
+                                          var options = {
+                                            title: 'Délai entre la fin du développement et la mise en production',
+
+                                            hAxis: {
+                                              title: 'User Stories'
+                                            },
+                                            vAxis: {
+                                              title: 'Nbre de jours de stock'
+                                            }
+                                          };
+
+                                          var chart = new google.visualization.LineChart(document.getElementById('chart_div_JS'));
+
+                                          chart.draw(data, options);
+
+                                      }
+
+
+
+
+                            <!--*******************************-->
+                            <!---->
+                            <!--*******Leadtime****************-->
+                            <!---->
+                            <!--*******************************-->
+
+
+                            AJS.$("<div id='chart_div_LD' />").appendTo(gadget.getView());
+
+                                      google.charts.load('current', {'packages':['corechart']});
+                                      google.charts.setOnLoadCallback(drawChart);
+
+                                      function drawChart() {
+                                        var jsonData = jQuery.ajax({
+                                          url: "/rest/kpi/1.0/ltime.json",
+                                          dataType: "json",
+                                          data:                     {
+                                                                        ProjectID: gadget.getPref("LDProjID"),
+                                                                        BacklogGroupe: gadget.getPref("LDBacklogGroup"),
+                                                                        TimeUnit: gadget.getPref("LDtimeUnit")
+                                                                    },
+                                          async: false
+                                          }).responseText;
+
+
+                                        var array  = jQuery.parseJSON(jsonData);
+
+                                        var data = new google.visualization.arrayToDataTable(array);
+
+                                        var options = {
+                                          title: 'La période entre le moment où la fonctionnalité a été créée et le moment où elle a été déployée',
+                                          hAxis: {title: 'User Stories', minValue: 0, maxValue: 15},
+                                          vAxis: {title: 'lead Time', minValue: 0, maxValue: 15},
+                                          legend: 'Lead Time'
+                                        };
+
+                                        var chart = new google.visualization.ScatterChart(document.getElementById('chart_div_LD'));
+
+                                        chart.draw(data, options);
+                                      }
+
+
+                                         <!--*******************************-->
+                                        <!---->
+                                        <!--*******EStimé/réalisé***********-->
+                                        <!---->
+                                        <!--*******************************-->
+
+                                        AJS.$("<div id='chart_div_ER' />").appendTo(gadget.getView());
+
+                                     google.charts.load('current', {packages: ['corechart', 'bar']});
+                                     google.charts.setOnLoadCallback(drawER);
+
+                                      function drawER() {
+
+
+                                        var jsonData = jQuery.ajax({
+                                          url: "/rest/kpi/1.0/estime.json",
+                                          dataType: "json",
+                                          async: false
+                                          }).responseText;
+
+
+                                        var array  = jQuery.parseJSON(jsonData);
+
+
+                                        var data = new google.visualization.DataTable();
+                                              data.addColumn('string', 'Sprint');
+                                              data.addColumn('number', 'US planifiées');
+                                              data.addColumn('number', 'US réalisées');
+
+                                              data.addRows(array);
+
+                                              var options = {
+                                                title: 'Taux de US réalisées par rapport aux US demandées au Sprint Planning',
+                                                colors: ['#9575cd', '#33ac71'],
+                                                hAxis: {
+                                                  title: 'nom des Sprint',
+
+                                                  viewWindow: {
+
+                                                  }
+                                                },
+                                                vAxis: {
+                                                  title: 'Nbre des US planifiées/réalisées'
+                                                }
+                                              };
+
+                                              var chart = new google.visualization.ColumnChart(document.getElementById('chart_div_ER'));
+                                              chart.draw(data, options);
+
+                                      }
+
+                                        <!--**************************-->
+                                        <!---->
+                                        <!--*******Velocity***********-->
+                                        <!---->
+                                        <!--**************************-->
+
+                                        AJS.$("<div id='chart_div_V' />").appendTo(gadget.getView());
+
+                                     google.charts.load('current', {packages: ['corechart', 'line']});
+                                     google.charts.setOnLoadCallback(drawVeloc);
+
+                                      function drawVeloc() {
+
+
+                                        var jsonData = jQuery.ajax({
+                                          url: "/rest/kpi/1.0/velocity.json",
+                                          dataType: "json",
+                                          async: false
+                                          }).responseText;
+
+
+                                        var array  = jQuery.parseJSON(jsonData);
+
+
+                                        var data = new google.visualization.DataTable();
+                                          data.addColumn('string', 'X');
+                                          data.addColumn('number', 'vélocité');
+
+                                          data.addRows(array);
+
+                                          var options = {
+                                            title: 'Total de points d’effort réalisés par sprint',
+
+                                            hAxis: {
+                                              title: 'nom des Sprints'
+                                            },
+                                            vAxis: {
+                                              title: 'vélocité'
+                                            }
+                                          };
+
+                                          var chart = new google.visualization.LineChart(document.getElementById('chart_div_V'));
+
+                                          chart.draw(data, options);
+                                        }
+
+
+
+
+
+
+
+
+
+                        },
+                        args: []
+                    }
+                });
+            })();
+        </script>
+        ]]>
+    </Content>
+</Module>

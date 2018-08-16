@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+    <ModulePrefs title="Agile KPI : Réalisé et Planifié" directory_title="" description="">
+        <Optional feature="gadget-directory">
+            <Param name="categories">
+                Other
+            </Param>
+        </Optional>
+        <Optional feature="atlassian.util" />
+        <Optional feature="auth-refresh" />
+        <Require feature="oauthpopup" />
+        <Require feature="dynamic-height"/>
+        <Require feature="setprefs"/>
+        <Require feature="settitle"/>
+        <Require feature="views"/>
+
+        #oauth
+        #supportedLocales("gadget.common,gadget.filter.results,gadget.issuetable.common")
+
+
+        <Locale messages="__ATLASSIAN_BASE_URL__/download/resources/com.atlassian.plugins.tutorial.jira-gadget-tutorial-plugin/i18n/ALL_ALL.xml"/>
+    </ModulePrefs>
+
+    <UserPref name="isConfigured" datatype="hidden" default_value="false"/>
+    <UserPref name="refresh" datatype="hidden" default_value="false"/>
+
+
+
+    <!--Estimé/réalisé-->
+    <UserPref name="ERconfig" datatype="hidden" />
+
+
+
+
+
+
+
+    <Content type="html" view="profile,canvas,home">
+        <![CDATA[
+        #requireResource("com.atlassian.jira.gadgets:common")
+        #requireResource("com.atlassian.gadgets.publisher:ajs-gadgets")
+        #requireResource("com.atlassian.jira.gadgets:autocomplete")
+        #includeResources()
+
+
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+            (function () {
+                var gadget = AJS.Gadget({
+                    baseUrl: "__ATLASSIAN_BASE_URL__",
+                    useOauth: "/rest/gadget/1.0/currentUser",
+
+
+                     config:
+                           {
+                            descriptor: function (args) {
+                            var gadget = this;
+
+                            var ok1=AJS.gadget.fields.projectOrFilterPicker(gadget, "JSProjID");
+                            var ok2=AJS.gadget.fields.projectOrFilterPicker(gadget, "LDProjID");
+
+
+                                    return {
+                                           fields: [
+
+
+
+                                                {
+                                                    type: "custom",
+                                                    template: function(){
+                                                        return "<div id='sla' class='sla'><strong class='titleText'> Configuration du KPI : Réalisé/planifié </strong></div>";
+                                                    }
+                                                },
+
+
+                                                {
+                                                    userpref: "ERconfig",
+                                                    label: "Sprint Board",
+                                                    description:"",
+                                                    type: "select",
+                                                    selected: gadget.getPref("ERconfig"),
+                                                    options:[
+
+                                                                {
+                                                            label:"BP board",
+                                                            value:"BP board"
+                                                                },
+                                                                {
+                                                            label:"TEST board",
+                                                            value:"TEST board"
+                                                                },
+                                                                {
+                                                            label:"PV board",
+                                                            value:"PV board"
+                                                                }
+                                                             ]
+                                               },
+
+
+                                                AJS.gadget.fields.nowConfigured()
+
+
+
+                                           ]
+
+                                    };
+                              }
+                            },
+
+
+
+                    view: {
+                        onResizeAdjustHeight: true,
+                        enableReload: true,
+                        template: function(args) {
+                            var gadget = this;
+
+                                       <!--*******************************-->
+                                        <!---->
+                                        <!--*******EStimé/réalisé***********-->
+                                        <!---->
+                                        <!--*******************************-->
+
+                                        AJS.$("<div id='chart_div_ER' />").appendTo(gadget.getView());
+
+                                     google.charts.load('current', {packages: ['corechart', 'bar']});
+                                     google.charts.setOnLoadCallback(drawER);
+
+                                      function drawER() {
+
+
+                                        var jsonData = jQuery.ajax({
+                                          url: "/rest/kpi/1.0/estime.json",
+                                          dataType: "json",
+                                          async: false
+                                          }).responseText;
+
+
+                                        var array  = jQuery.parseJSON(jsonData);
+
+
+                                        var data = new google.visualization.DataTable();
+                                              data.addColumn('string', 'Sprint');
+                                              data.addColumn('number', 'US planifiées');
+                                              data.addColumn('number', 'US réalisées');
+
+                                              data.addRows(array);
+
+                                              var options = {
+                                                title: 'Taux de US réalisées par rapport aux US demandées au Sprint Planning',
+                                                colors: ['#9575cd', '#33ac71'],
+                                                hAxis: {
+                                                  title: 'nom des Sprint',
+
+                                                  viewWindow: {
+
+                                                  }
+                                                },
+                                                vAxis: {
+                                                  title: 'Nbre des US planifiées/réalisées'
+                                                }
+                                              };
+
+                                              var chart = new google.visualization.ColumnChart(document.getElementById('chart_div_ER'));
+                                              chart.draw(data, options);
+
+                                      }
+
+
+
+                        },
+                        args: []
+                    }
+                });
+            })();
+        </script>
+        ]]>
+    </Content>
+</Module>

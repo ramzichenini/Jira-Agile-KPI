@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+    <ModulePrefs title="Agile KPI : Lead Time" directory_title="" description="">
+        <Optional feature="gadget-directory">
+            <Param name="categories">
+                Other
+            </Param>
+        </Optional>
+        <Optional feature="atlassian.util" />
+        <Optional feature="auth-refresh" />
+        <Require feature="oauthpopup" />
+        <Require feature="dynamic-height"/>
+        <Require feature="setprefs"/>
+        <Require feature="settitle"/>
+        <Require feature="views"/>
+
+        #oauth
+        #supportedLocales("gadget.common,gadget.filter.results,gadget.issuetable.common")
+
+
+        <Locale messages="__ATLASSIAN_BASE_URL__/download/resources/com.atlassian.plugins.tutorial.jira-gadget-tutorial-plugin/i18n/ALL_ALL.xml"/>
+    </ModulePrefs>
+
+    <UserPref name="isConfigured" datatype="hidden" default_value="false"/>
+    <UserPref name="refresh" datatype="hidden" default_value="false"/>
+
+
+
+    <!--Lead Time-->
+    <UserPref name="LDtimeUnit" datatype="hidden" />
+    <UserPref name="LDBacklogGroup" datatype="hidden" />
+    <UserPref name="LDProjID" datatype="hidden" />
+
+
+    <Content type="html" view="profile,canvas,home">
+        <![CDATA[
+        #requireResource("com.atlassian.jira.gadgets:common")
+        #requireResource("com.atlassian.gadgets.publisher:ajs-gadgets")
+        #requireResource("com.atlassian.jira.gadgets:autocomplete")
+        #includeResources()
+
+
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+            (function () {
+                var gadget = AJS.Gadget({
+                    baseUrl: "__ATLASSIAN_BASE_URL__",
+                    useOauth: "/rest/gadget/1.0/currentUser",
+
+
+                     config:
+                           {
+                            descriptor: function (args) {
+                            var gadget = this;
+
+                            var ok1=AJS.gadget.fields.projectOrFilterPicker(gadget, "JSProjID");
+                            var ok2=AJS.gadget.fields.projectOrFilterPicker(gadget, "LDProjID");
+
+
+                                    return {
+                                           fields: [
+
+
+
+                                                  <!--*******************************-->
+                                                    <!--lead time fields-->
+                                                  <!--*******************************-->
+
+                                                  {
+                                                    type: "custom",
+                                                    template: function(){
+                                                        return "<div id='sla' class='sla'><strong class='titleText'> Configuration du KPI : Lead Time </strong></div>";
+                                                    }
+                                                },
+
+                                                ok2,
+                                               {
+                                                    userpref: "LDtimeUnit",
+                                                    label: "unité de la période  ?",
+                                                    description:"",
+                                                    type: "select",
+                                                    selected: gadget.getPref("LDtimeUnit"),
+                                                    options:[
+
+                                                                {
+                                                            label:"minute",
+                                                            value:"min"
+                                                                },
+                                                                {
+                                                            label:"heure",
+                                                            value:"hour"
+                                                                },
+                                                                {
+                                                            label:"jour",
+                                                            value:"day"
+                                                                }
+                                                             ]
+                                               },
+
+
+                                                {
+                                                    userpref: "LDBacklogGroup",
+                                                    label: "les backlogs à présenter ?",
+                                                    description:"",
+                                                    type: "select",
+                                                    selected: gadget.getPref("LDBacklogGroup"),
+                                                    options:[
+
+                                                                {
+                                                            label:"tous les backlogs",
+                                                            value:"AllBG"
+                                                                },
+                                                                {
+                                                            label:"les backlogs du projet séléctionné",
+                                                            value:"ProjectBG"
+                                                                },
+                                                                {
+                                                            label:"les backlog du sprint courant",
+                                                            value:"SprintCourantBG"
+                                                                }
+                                                             ]
+                                               },
+
+
+
+
+                                                AJS.gadget.fields.nowConfigured()
+
+
+
+                                           ]
+
+                                    };
+                              }
+                            },
+
+
+
+                    view: {
+                        onResizeAdjustHeight: true,
+                        enableReload: true,
+                        template: function(args) {
+                            var gadget = this;
+
+                            <!--*******************************-->
+                            <!---->
+                            <!--*******Leadtime****************-->
+                            <!---->
+                            <!--*******************************-->
+
+
+                            AJS.$("<div id='chart_div_LD' />").appendTo(gadget.getView());
+
+                                      google.charts.load('current', {'packages':['corechart']});
+                                      google.charts.setOnLoadCallback(drawChart);
+
+                                      function drawChart() {
+                                        var jsonData = jQuery.ajax({
+                                          url: "/rest/kpi/1.0/ltime.json",
+                                          dataType: "json",
+                                          data:                     {
+                                                                        ProjectID: gadget.getPref("LDProjID"),
+                                                                        BacklogGroupe: gadget.getPref("LDBacklogGroup"),
+                                                                        TimeUnit: gadget.getPref("LDtimeUnit")
+                                                                    },
+                                          async: false
+                                          }).responseText;
+
+
+                                        var array  = jQuery.parseJSON(jsonData);
+
+                                        var data = new google.visualization.arrayToDataTable(array);
+
+                                        var options = {
+                                          title: 'La période entre le moment où la fonctionnalité a été créée et le moment où elle a été déployée',
+                                          hAxis: {title: 'User Stories', minValue: 0, maxValue: 15},
+                                          vAxis: {title: 'lead Time', minValue: 0, maxValue: 15},
+                                          legend: 'Lead Time'
+                                        };
+
+                                        var chart = new google.visualization.ScatterChart(document.getElementById('chart_div_LD'));
+
+                                        chart.draw(data, options);
+                                      }
+
+
+
+
+
+
+                        },
+                        args: []
+                    }
+                });
+            })();
+        </script>
+        ]]>
+    </Content>
+</Module>
