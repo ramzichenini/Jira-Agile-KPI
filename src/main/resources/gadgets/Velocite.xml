@@ -54,9 +54,18 @@
                            {
                             descriptor: function (args) {
                             var gadget = this;
+                            var showSelectBoards = function(name)
 
-                            var ok1=AJS.gadget.fields.projectOrFilterPicker(gadget, "JSProjID");
-                            var ok2=AJS.gadget.fields.projectOrFilterPicker(gadget, "LDProjID");
+                                    {
+                                        return {
+                                            userpref: "Vconfig",
+                                            label: "Sprint Board",
+                                            type: "select",
+                                            options: args.BoadsList.choix
+                                        };
+                                    };
+
+
 
 
                                     return {
@@ -72,29 +81,7 @@
                                                 },
 
 
-                                                {
-                                                    userpref: "Vconfig",
-                                                    label: "Sprint Board",
-                                                    description:"",
-                                                    type: "select",
-                                                    selected: gadget.getPref("Vconfig"),
-                                                    options:[
-
-                                                                {
-                                                            label:"BP board",
-                                                            value:"BP board"
-                                                                },
-                                                                {
-                                                            label:"TEST board",
-                                                            value:"TEST board"
-                                                                },
-                                                                {
-                                                            label:"PV board",
-                                                            value:"PV board"
-                                                                }
-                                                             ]
-                                               },
-
+                                                showSelectBoards(),
 
                                                 AJS.gadget.fields.nowConfigured()
 
@@ -103,8 +90,19 @@
                                            ]
 
                                     };
-                              }
-                            },
+                              },
+
+
+
+                    args: [
+                        {
+                            key: "BoadsList",
+                            ajaxOptions:  "/rest/kpi/1.0/getBoadsList.json"
+                        }
+                    ]
+
+
+                    },
 
 
 

@@ -1,4 +1,4 @@
-package rest;
+package KPIsRest;
 
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;

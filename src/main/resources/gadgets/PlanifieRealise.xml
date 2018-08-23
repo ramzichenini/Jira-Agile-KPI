@@ -57,12 +57,20 @@
                             descriptor: function (args) {
                             var gadget = this;
 
-                            var ok1=AJS.gadget.fields.projectOrFilterPicker(gadget, "JSProjID");
-                            var ok2=AJS.gadget.fields.projectOrFilterPicker(gadget, "LDProjID");
+                            var showSelectBoards = function(name)
 
+                                    {
+                                        return {
+                                            userpref: "ERconfig",
+                                            label: "Sprint Board",
+                                            type: "select",
+                                            options: args.BoadsList.choix
+                                        };
+                                    };
 
                                     return {
                                            fields: [
+
 
 
 
@@ -73,29 +81,10 @@
                                                     }
                                                 },
 
+                                                 showSelectBoards(),
 
-                                                {
-                                                    userpref: "ERconfig",
-                                                    label: "Sprint Board",
-                                                    description:"",
-                                                    type: "select",
-                                                    selected: gadget.getPref("ERconfig"),
-                                                    options:[
 
-                                                                {
-                                                            label:"BP board",
-                                                            value:"BP board"
-                                                                },
-                                                                {
-                                                            label:"TEST board",
-                                                            value:"TEST board"
-                                                                },
-                                                                {
-                                                            label:"PV board",
-                                                            value:"PV board"
-                                                                }
-                                                             ]
-                                               },
+
 
 
                                                 AJS.gadget.fields.nowConfigured()
@@ -105,8 +94,18 @@
                                            ]
 
                                     };
-                              }
-                            },
+                              },
+
+
+
+                   args: [
+                        {
+                            key: "BoadsList",
+                            ajaxOptions:  "/rest/kpi/1.0/getBoadsList.json"
+                        }
+                    ]
+
+                    },
 
 
 
